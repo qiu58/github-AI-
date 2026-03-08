@@ -13,7 +13,10 @@ PUSHDEER_KEY = os.getenv("PUSHDEER_KEY")
 MY_VERCEL_URL = os.getenv("MY_VERCEL_URL")
 
 g = Github(GITHUB_TOKEN)
-client = OpenAI(api_key=OPENAI_API_KEY)
+client = OpenAI(
+    api_key=OPENAI_API_KEY,
+    base_url="https://api.aaai.vip/v1"
+)
 
 def search_repositories():
     keywords = ["RAG", "AI Agent", "LangChain"]
