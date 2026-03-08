@@ -1,0 +1,29 @@
+name: Daily AI Tech Hunt
+
+on:
+  schedule:
+    - cron: '0 1 * * *' # 每天北京时间早上9点运行 (UTC时间凌晨1点)
+  workflow_dispatch: # 👈 极其重要！只有加了这行，才会出现手动 "Run workflow" 的按钮！
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          
+      - name: Run AI Hunter Script
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PUSHDEER_KEY: ${{ secrets.PUSHDEER_KEY }}
+        run: python main.py
