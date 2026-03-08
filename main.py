@@ -9,8 +9,7 @@ load_dotenv()
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-PUSHDEER_KEY = os.getenv("PUSHDEER_KEY")
-MY_VERCEL_URL = os.getenv("MY_VERCEL_URL")
+# MY_VERCEL_URL 已经被下面直接写死了，不需要再去环境变量里找了，防止报错
 
 g = Github(GITHUB_TOKEN)
 client = OpenAI(
@@ -19,11 +18,14 @@ client = OpenAI(
 )
 
 def search_repositories():
-    keywords = ["RAG", "AI Agent", "LangChain"]
+    keywords = [
+        "RAG", "Agent", "LangChain", "LlamaIndex", 
+        "Ollama", "vLLM", "LoRA", "Recommender System"
+    ]
     since_date = datetime.datetime.utcnow() - datetime.timedelta(days=1)
     since_str = since_date.strftime("%Y-%m-%d")
     
-   all_repos = []
+    all_repos = []
     for keyword in keywords:
         query = f"{keyword} created:>{since_str}"
         repos = g.search_repositories(query=query, sort="stars", order="desc")
@@ -92,11 +94,11 @@ def analyze_repos_with_ai(repos_with_keywords):
             "stars": 星数,
             "core_tech": "核心技术点（解决了什么痛点，100字以内）",
             "url": "GitHub链接",
-            "keyword": "RAG/Agent"
+            "keyword": "RAG/Agent/LLM等简短标签"
         }
     ]
 }
-keyword 统一使用 RAG 或 Agent，不要用其他值。"""
+keyword 请根据该项目的实际核心技术给出一个简短的英文标签。"""
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",
@@ -118,7 +120,9 @@ def generate_markdown(top_projects):
     for i, project in enumerate(top_projects, 1):
         zhihu_search = f"https://www.zhihu.com/search?q={project['name']}"
         xiaohongshu_search = f"https://www.xiaohongshu.com/search_result?keyword={project['name']}"
-        star_link = f"https://{MY_VERCEL_URL}/star?repo={project['name']}&category={project['keyword']}"
+        
+        # 你的专属 Vercel 域名已经在这里直接写死
+        star_link = f"https://github-ai-kappa.vercel.app/api/star?repo={project['name']}&category={project['keyword']}"
         
         markdown += f"## {i}. {project['name']}\n\n"
         markdown += f"⭐ Stars: {project['stars']}\n\n"
@@ -131,7 +135,7 @@ def generate_markdown(top_projects):
     return markdown
 
 def push_to_wechat(content):
-    # 这里记得我们要去 GitHub Secrets 里配置一个新的变量叫 SERVERCHAN_KEY
+    # 获取 Server酱 的 Key
     SERVERCHAN_KEY = os.getenv("SERVERCHAN_KEY") 
     
     if not SERVERCHAN_KEY:
@@ -141,7 +145,7 @@ def push_to_wechat(content):
     url = f"https://sctapi.ftqq.com/{SERVERCHAN_KEY}.send"
     data = {
         "title": "🚀 每日 AI 技术精选",
-        "desp": content # Server酱使用 desp 参数接收 Markdown 内容
+        "desp": content 
     }
     response = requests.post(url, data=data)
     return response.status_code == 200
@@ -159,8 +163,8 @@ def main():
     markdown = generate_markdown(top_projects)
     
     print("📤 推送到微信...")
-    if push_to_pushdeer(markdown):
-        print("✅ 推送成功！")
+    if push_to_wechat(markdown): # 这里已经修正为你新建的推送到微信的函数
+        print("✅ 微信推送成功！")
     else:
         print("❌ 推送失败")
     
