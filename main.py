@@ -134,7 +134,7 @@ def generate_markdown(top_projects):
         markdown += f"- **🧠 核心思路**: {project['core_approach']}\n"
         markdown += f"- **⚙️ 方法框架**: {project['method_framework']}\n\n"
         markdown += f"🔗 **开源地址**: [前往 GitHub 查看项目详情]({project['url']})\n\n"
-        markdown += f"📚 **教程搜索**: [知乎]({zhihu_search}) | [小红书]({xiaohongshu_search})\n\n"
+        markdown += f"📚 **教程搜索**: [知乎]({zhihu_search})\n\n"
         markdown += f"⚡ **一键操作**: [❤️ 收藏至我的 AI 知识库]({star_link})\n\n"
         markdown += "---\n\n"
     
